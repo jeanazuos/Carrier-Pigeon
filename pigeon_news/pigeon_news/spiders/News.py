@@ -10,4 +10,5 @@ class NewsSpider(scrapy.Spider):
     def parse(self, response):
         for article in response.css("item"):
             title = article.css("title").extract_first()
-            yield{'title': title}
+            url = article.css("link").extract_first()
+            yield{'title': title, 'link': url}
