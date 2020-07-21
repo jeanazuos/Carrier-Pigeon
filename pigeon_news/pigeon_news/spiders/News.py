@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-
+from pigeon_news.items import PigeonNewsItem
 
 class NewsSpider(scrapy.Spider):
     name = 'News'
@@ -11,4 +11,5 @@ class NewsSpider(scrapy.Spider):
         for article in response.css("item"):
             title = article.css("title").extract_first()
             url = article.css("link").extract_first()
-            yield{'title': title, 'link': url}
+            notice = PigeonNewsItem(title=title, link=url)
+            yield notice
