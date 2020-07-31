@@ -12,35 +12,34 @@ import os
 class PigeonNewsPipeline:
 
     def mongo_config(self):
-        self.collection = mongo_collection_name = os.environ.get('MONGO_COLLECTION')
-        self.uri = mongo_uri = os.environ.get('MONGO_URI')
-        self.database = mongo_db = os.environ.get('MONGO_DATABASE')
-        self.port = mongo_port = int(os.environ.get('MONGO_PORT'))
-        self.user = mongo_user = os.environ.get('MONGO_USER')
-        self.password = mongo_pass = os.environ.get('MONGO_PASS')
-        pass
+        
+        self.collection = os.environ.get('MONGO_COLLECTION')
+        self.uri = os.environ.get('MONGO_URI')
+        self.database = os.environ.get('MONGO_DATABASE')
+        self.port = int(os.environ.get('MONGO_PORT'))
+        self.user = os.environ.get('MONGO_USER')
+        self.password = os.environ.get('MONGO_PASS')
 
-    #abrir conexao com banco
+        self.client = MongoClient(
+        self.uri,
+        self.port,
+        username = self.user,
+        password = self.password
+        )
+        self.db = self.client[self.database]
+        
+
+
+    # Abre conexao com banco
     def open_spider(self, spider):
-        try:
-            self.client = MongoClient(
-                self.uri,
-                self.port,
-                username = self.user,
-                password = self.password
-            )
-            self.db = self.client[self.database]
-        except Exception as e:
-            print(f"Connection mongoDB error {str(e)}")
-            return str(e), 400
+        self.mongo_config()
 
+    # Fecha conexao com banco
     def close_spider(self, spider):
         self.client.close()
-        pass
 
     def process_item(self, item, spider):
         self.set_data(item)
-        return item
 
     def set_data(self, item):
         self.db[self.collection].insert(dict(item))
