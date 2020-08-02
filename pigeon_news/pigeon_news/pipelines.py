@@ -39,7 +39,43 @@ class PigeonNewsPipeline:
         self.client.close()
 
     def process_item(self, item, spider):
+        item = cleaner(item)
         self.set_data(item)
 
     def set_data(self, item):
         self.db[self.collection].insert(dict(item))
+
+# Parser method
+def tags_remover(content):
+    tags_to_remove = [
+    '<title xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">',
+    '</title>',
+    '<link xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">',
+    '</link>'
+    ]
+    for item_clear in tags_to_remove:
+        content = content.split(item_clear)
+        if not content[0]:
+            content=content[1]
+        else:
+            content=content[0]
+    return content
+
+# Parser method
+def cleaner(item):
+    try:
+        content = {}
+        if item.get('title'):
+            title = item.get('title')
+            content['title'] = tags_remover(title)
+
+        if item.get('link'):
+            link = item.get('link')
+            content['link'] = tags_remover(link)
+        return content
+    
+
+    except ValueError:
+        #implementar lib de log
+        print("Nao foi possivel encontrar a tag title no xml")
+
