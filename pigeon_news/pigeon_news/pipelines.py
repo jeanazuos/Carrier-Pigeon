@@ -8,6 +8,7 @@
 import json
 from pymongo import MongoClient
 import os
+from datetime import datetime
 
 class PigeonNewsPipeline:
 
@@ -72,6 +73,9 @@ def cleaner(item):
         if item.get('link'):
             link = item.get('link')
             content['link'] = tags_remover(link)
+            
+        # Add time now to dict
+        content["processing_date"] = processing_date()
         return content
     
 
@@ -79,3 +83,7 @@ def cleaner(item):
         #implementar lib de log
         print("Nao foi possivel encontrar a tag title no xml")
 
+def processing_date():
+    now = datetime.now()
+    today = now.strftime("%d/%m/%Y %H:%M:%S")
+    return today
