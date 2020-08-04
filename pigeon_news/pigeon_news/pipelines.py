@@ -9,6 +9,7 @@ import json
 from pymongo import MongoClient
 import os
 from datetime import datetime
+import re
 
 class PigeonNewsPipeline:
 
@@ -46,21 +47,12 @@ class PigeonNewsPipeline:
     def set_data(self, item):
         self.db[self.collection].insert(dict(item))
 
-# Parser method
+# regex to remove html and entities like &lt, &gt, &nbsp
 def tags_remover(content):
-    tags_to_remove = [
-    '<title xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">',
-    '</title>',
-    '<link xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">',
-    '</link>'
-    ]
-    for item_clear in tags_to_remove:
-        content = content.split(item_clear)
-        if not content[0]:
-            content=content[1]
-        else:
-            content=content[0]
+    cleaner = re.compile('<.*?>|(&.+;)|\s{2,6}')
+    content = re.sub(cleaner,'',content)
     return content
+
 
 # Parser method
 def cleaner(item):
@@ -73,9 +65,14 @@ def cleaner(item):
         if item.get('link'):
             link = item.get('link')
             content['link'] = tags_remover(link)
-            
+        
+        if item.get('description'):
+            description = item.get('description')
+            content['description'] = tags_remover(description)
+
         # Add time now to dict
         content["processing_date"] = processing_date()
+
         return content
     
 
@@ -87,3 +84,4 @@ def processing_date():
     now = datetime.now()
     today = now.strftime("%d/%m/%Y %H:%M:%S")
     return today
+
