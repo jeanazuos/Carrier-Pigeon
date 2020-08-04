@@ -8,39 +8,80 @@
 import json
 from pymongo import MongoClient
 import os
+from datetime import datetime
+import re
 
 class PigeonNewsPipeline:
 
     def mongo_config(self):
-        self.collection = mongo_collection_name = os.environ.get('MONGO_COLLECTION')
-        self.uri = mongo_uri = os.environ.get('MONGO_URI')
-        self.database = mongo_db = os.environ.get('MONGO_DATABASE')
-        self.port = mongo_port = int(os.environ.get('MONGO_PORT'))
-        self.user = mongo_user = os.environ.get('MONGO_USER')
-        self.password = mongo_pass = os.environ.get('MONGO_PASS')
-        pass
+        
+        self.collection = os.environ.get('MONGO_COLLECTION')
+        self.uri = os.environ.get('MONGO_URI')
+        self.database = os.environ.get('MONGO_DATABASE')
+        self.port = int(os.environ.get('MONGO_PORT'))
+        self.user = os.environ.get('MONGO_USER')
+        self.password = os.environ.get('MONGO_PASS')
 
-    #abrir conexao com banco
+        self.client = MongoClient(
+        self.uri,
+        self.port,
+        username = self.user,
+        password = self.password
+        )
+        self.db = self.client[self.database]
+        
+
+
+    # Abre conexao com banco
     def open_spider(self, spider):
-        try:
-            self.client = MongoClient(
-                self.uri,
-                self.port,
-                username = self.user,
-                password = self.password
-            )
-            self.db = self.client[self.database]
-        except Exception as e:
-            print(f"Connection mongoDB error {str(e)}")
-            return str(e), 400
+        self.mongo_config()
 
+    # Fecha conexao com banco
     def close_spider(self, spider):
         self.client.close()
-        pass
 
     def process_item(self, item, spider):
+        item = cleaner(item)
         self.set_data(item)
-        return item
 
     def set_data(self, item):
         self.db[self.collection].insert(dict(item))
+
+# regex to remove html and entities like &lt, &gt, &nbsp
+def tags_remover(content):
+    cleaner = re.compile('<.*?>|(&.+;)|\s{2,6}')
+    content = re.sub(cleaner,'',content)
+    return content
+
+
+# Parser method
+def cleaner(item):
+    try:
+        content = {}
+        if item.get('title'):
+            title = item.get('title')
+            content['title'] = tags_remover(title)
+
+        if item.get('link'):
+            link = item.get('link')
+            content['link'] = tags_remover(link)
+        
+        if item.get('description'):
+            description = item.get('description')
+            content['description'] = tags_remover(description)
+
+        # Add time now to dict
+        content["processing_date"] = processing_date()
+
+        return content
+    
+
+    except ValueError:
+        #implementar lib de log
+        print("Nao foi possivel encontrar a tag title no xml")
+
+def processing_date():
+    now = datetime.now()
+    today = now.strftime("%d/%m/%Y %H:%M:%S")
+    return today
+
