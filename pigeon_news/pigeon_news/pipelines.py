@@ -80,6 +80,10 @@ def cleaner(item):
             description = item.get('description')
             content['description'] = tags_remover(description)
 
+        if item.get('publication_date'):
+            publication = item.get('publication_date')
+            content['publication_date'] = tags_remover(publication)
+
         if item.get('media'):
             media = item.get('media')
             content['media'] = media

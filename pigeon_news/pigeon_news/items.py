@@ -15,4 +15,5 @@ class PigeonNewsItem(scrapy.Item):
     link = scrapy.Field()
     description = scrapy.Field()
     media = scrapy.Field()
+    publication_date = scrapy.Field()
     
