@@ -70,6 +70,10 @@ def cleaner(item):
             description = item.get('description')
             content['description'] = tags_remover(description)
 
+        if item.get('media'):
+            media = item.get('media')
+            content['media'] = media
+
         # Add time now to dict
         content["processing_date"] = processing_date()
 
