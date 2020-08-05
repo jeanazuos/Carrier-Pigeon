@@ -41,11 +41,21 @@ class PigeonNewsPipeline:
         self.client.close()
 
     def process_item(self, item, spider):
+        # Clean tags
         item = cleaner(item)
-        self.set_data(item)
+        # Check if title exists to don't duplicated
+        if not self.get_one_data("title", item['title']):
+            self.set_data(item)
+        else:
+            # implement log
+            print("Noticia já existente")
 
     def set_data(self, item):
         self.db[self.collection].insert(dict(item))
+
+    # it's a find_one() to return a single data
+    def get_one_data(self, key, value):
+        return self.db[self.collection].find_one({key: value})
 
 # regex to remove html and entities like &lt, &gt, &nbsp
 def tags_remover(content):
