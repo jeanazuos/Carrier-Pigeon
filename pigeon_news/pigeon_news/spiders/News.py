@@ -11,5 +11,9 @@ class NewsSpider(scrapy.Spider):
         for article in response.css("item"):
             title = article.css("title").extract_first()
             url = article.css("link").extract_first()
-            notice = PigeonNewsItem(title=title, link=url)
+            description = article.css("description").extract_first()
+            media = article.css("media\\:content::attr(url)").extract_first()
+            publication_date = article.css("pubDate").extract_first()
+
+            notice = PigeonNewsItem(title=title, link=url, description=description, media=media, publication_date=publication_date)
             yield notice
