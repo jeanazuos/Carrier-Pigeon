@@ -3,7 +3,7 @@ FROM python:3-alpine
 MAINTAINER Jean Souza <jean.azuos@gmail.com>
 
 COPY app.py /app/
-COPY /pigeon_news /app/
+COPY pigeon_news /app/pigeon_news
 COPY requirements.txt /app/
 COPY scrapy.cfg /app/
 
