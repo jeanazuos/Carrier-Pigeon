@@ -16,11 +16,11 @@ class PigeonNewsPipeline:
     def mongo_config(self):
         
         self.collection = os.environ.get('MONGO_COLLECTION')
-        self.uri = os.environ.get('MONGO_URI')
-        self.database = os.environ.get('MONGO_DATABASE')
+        self.uri = os.environ.get('MONGODB_HOSTNAME')
+        self.database = os.environ.get('MONGODB_DATABASE')
         self.port = int(os.environ.get('MONGO_PORT'))
-        self.user = os.environ.get('MONGO_USER')
-        self.password = os.environ.get('MONGO_PASS')
+        self.user = os.environ.get('MONGODB_USERNAME')
+        self.password = os.environ.get('MONGODB_PASSWORD')
 
         self.client = MongoClient(
         self.uri,
@@ -30,8 +30,6 @@ class PigeonNewsPipeline:
         )
         self.db = self.client[self.database]
         
-
-
     # Abre conexao com banco
     def open_spider(self, spider):
         self.mongo_config()
