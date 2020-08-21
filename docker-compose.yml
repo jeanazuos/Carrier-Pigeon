@@ -4,7 +4,7 @@ services:
         image: mongo:4.0.8
         container_name: db
         ports: 
-            - "5000:27017"
+            - '5000:27017'
         environment: 
             MONGO_INITDB_ROOT_USERNAME: admin
             MONGO_INITDB_ROOT_PASSWORD: admin123
@@ -16,11 +16,11 @@ services:
         image: basilisco/flask
         container_name: app
         ports: 
-            - "8080:80"
+            - '8080:80'
         depends_on: 
             - db
         environment:
-            
+            TIMER: '10' # RUN EVERY 10 MINUTES
             MONGO_COLLECTION: news
             MONGO_DATABASE: content
             MONGO_PORT: '5000'
