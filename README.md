@@ -13,7 +13,7 @@ A ideia principal é que esse script seja parte de um conjunto de microserviços
 
 # Como executar a aplicação?
 * Clone o repositório e entre no diretório raiz;
-* Execute o comando "docker build . -t basilisco/flask";
+* Execute o comando "docker build . -t carrier_pigeon";
 * Execute o comando "docker-compose up".
 
 Realizando os três passos acima vamos ter 2 aplicações rodando no Docker, uma sendo a app responsável por realizar o crawler e persistir os dados, a outra o próprio banco mongoDB.
