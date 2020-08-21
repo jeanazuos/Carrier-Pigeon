@@ -1,0 +1,33 @@
+version: '3.4'
+services:
+    db:
+        image: mongo:4.0.8
+        container_name: db
+        ports: 
+            - "5000:27017"
+        environment: 
+            MONGO_INITDB_ROOT_USERNAME: admin
+            MONGO_INITDB_ROOT_PASSWORD: admin123
+            MONGO_INITDB_DATABASE: content
+        volumes: 
+            - mongodbdata:/data/db
+
+    app: 
+        image: basilisco/flask
+        container_name: app
+        ports: 
+            - "8080:80"
+        depends_on: 
+            - db
+        environment:
+            
+            MONGO_COLLECTION: news
+            MONGO_DATABASE: content
+            MONGO_PORT: '5000'
+            MONGODB_DATABASE: content
+            MONGODB_USERNAME: admin
+            MONGODB_PASSWORD: admin123
+            MONGODB_HOSTNAME: '172.22.0.1'
+
+volumes: 
+    mongodbdata:
