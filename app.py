@@ -1,22 +1,27 @@
-from scrapy.crawler import CrawlerProcess
+from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
 from pigeon_news.spiders.News import NewsSpider
 from datetime import datetime
-import schedule
 import time
 import os
 import logging
+from twisted.internet import reactor
 
-# Job to be run every x minutes
-def job():
-    logging.info("Inicio do job { datetime.now().strftime('%m/%d/%Y, %H:%M:%S') }")
-    process = CrawlerProcess(get_project_settings())
-    process.crawl(NewsSpider)
-    process.start()
+# To be run every time duration in seconds
+def sleep(_, duration=5):
+    logging.info(f'sleeping for: {duration}')
+    time.sleep(duration)
 
-# Set timer to be run
-schedule.every(int(os.getenv('TIMER'))).minutes.do(job)
+def crawl(runner):
+    d = runner.crawl(NewsSpider)
+    d.addBoth(sleep)
+    d.addBoth(lambda _: crawl(runner))
+    return d
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+def loop_crawl():
+    runner = CrawlerRunner(get_project_settings())
+    crawl(runner)
+    reactor.run()
+
+if __name__ == '__main__':
+    loop_crawl()
