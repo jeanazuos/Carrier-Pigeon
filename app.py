@@ -9,7 +9,7 @@ from twisted.internet import reactor
 
 # To be run every time duration in seconds
 def sleep(_, duration=int(os.getenv('TIMER'))):
-    print(f'sleeping for: {duration}')
+    logging.info(f'Sleeping for: {duration}')
     time.sleep(duration)
 
 def crawl(runner):
@@ -24,4 +24,6 @@ def loop_crawl():
     reactor.run()
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+    logging.info('Started process')
     loop_crawl()
