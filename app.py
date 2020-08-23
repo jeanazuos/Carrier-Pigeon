@@ -8,8 +8,8 @@ import logging
 from twisted.internet import reactor
 
 # To be run every time duration in seconds
-def sleep(_, duration=5):
-    logging.info(f'sleeping for: {duration}')
+def sleep(_, duration=int(os.getenv('TIMER'))):
+    print(f'sleeping for: {duration}')
     time.sleep(duration)
 
 def crawl(runner):
